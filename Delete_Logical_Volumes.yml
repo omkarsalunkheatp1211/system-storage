@@ -1,0 +1,25 @@
+---
+- name: Unmount Filesystems
+  hosts: web
+  vars_files:
+    - storage_vars.yml
+  tasks:
+    - name: Unmount Filesystems
+      mount:
+        path: "{{ item.mount_path }}"
+        state: unmounted
+      loop: "{{ logical_volumes }}"
+      ignore_errors: yes
+
+- name: Delete Logical Volumes
+  hosts: web
+  vars_files:
+    - storage_vars.yml
+  tasks:
+    - name: Delete Logical Volumes
+      lvol:
+        vg: "{{ item.vgroup }}"
+        lv: "{{ item.name }}"
+        state: absent
+        force: yes
+      loop: "{{ logical_volumes }}"
